@@ -25,7 +25,7 @@ type Entry struct {
 	CreatedAt time.Time
 }
 
-type Tranfer struct {
+type Transfer struct {
 	ID            int64
 	FromAccountID int64
 	ToAccountID   int64
