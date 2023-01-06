@@ -11,5 +11,7 @@ dropdb:
 	docker exec -it postgres2 dropdb simple_bank
 accessdb:
 	docker exec -it postgres2 psql  simple_bank
+cc:
+	go clean -testcache
 
-.PHONY: accessdb migrateup migratedown migratecreate createdb dropdb
+.PHONY: accessdb migrateup migratedown migratecreate createdb dropdb cc
