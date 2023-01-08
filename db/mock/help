@@ -1,0 +1,1 @@
+mockgen -package mockdb -destination db/mock/store.go github.com/MeganViga/SimpleBank2/db/sqlc Store

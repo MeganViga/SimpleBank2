@@ -8,13 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type createAccountRequest struct{
+type createAccountRequestParams struct{
 	Owner string `json:"owner" binding:"required"`
 	Balance int64  `json:"balance" binding:"required"`
 	Curremcy string  `json:"currency" binding:"required"`
 }
 func (s *Server)createUser(ctx *gin.Context){
-	var req createAccountRequest
+	var req createAccountRequestParams
 	if err := ctx.ShouldBindJSON(&req); err != nil{
 		ctx.JSON(http.StatusBadRequest,err)
 		return
@@ -33,4 +33,20 @@ func (s *Server)createUser(ctx *gin.Context){
 	}
 	ctx.JSON(http.StatusOK,user)
 
+}
+type getAccountRequestParams struct{
+	Id int64 `uri:"id" binding:"required"`
+}
+func (s *Server)getAccount(ctx *gin.Context){
+	var req getAccountRequestParams
+	if err := ctx.ShouldBindUri(&req); err != nil{
+		ctx.JSON(http.StatusBadRequest,err)
+		return
+	}
+	//fmt.Println(req.Id)
+	account, err := s.store.GetAccount(ctx,req.Id)
+	if err != nil{
+		ctx.JSON(http.StatusInternalServerError,err)
+	}
+	ctx.JSON(http.StatusOK,account)
 }

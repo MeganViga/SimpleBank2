@@ -13,5 +13,7 @@ accessdb:
 	docker exec -it postgres2 psql  simple_bank
 cc:
 	go clean -testcache
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/MeganViga/SimpleBank2/db/sqlc Store
 
-.PHONY: accessdb migrateup migratedown migratecreate createdb dropdb cc
+.PHONY: accessdb migrateup migratedown migratecreate createdb dropdb cc mock
