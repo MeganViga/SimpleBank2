@@ -53,7 +53,7 @@ func TestCreateAccount(t *testing.T){
 	server.router.ServeHTTP(recorder,request)
 
 	//checking response
-	t.Log(recorder)
+	t.Log(recorder) //--> to Log to Stdout on go teest flow
 	require.Equal(t,http.StatusOK,recorder.Code)
 	//t.Log(recorder)
 }
