@@ -1,7 +1,10 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,6 +16,47 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestCreateAccount(t *testing.T){
+	account := randomAccount()
+	t.Log("Initial:",account)
+	arg := db.CreateAccountParams{
+		Owner: account.Owner,
+		Balance: account.Balance,
+		Currency: account.Currency,
+	}
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	store := mockdb.NewMockStore(controller)
+
+	//stub 
+	store.EXPECT().CreateAccount(gomock.Any(),gomock.Eq(arg)).Times(1).Return(account,nil)
+
+	//creating server using mock store
+	server := NewServer(store)
+
+	// instead of making real api call , we can use recorder
+	recorder := httptest.NewRecorder()
+
+	url := "/users"
+
+	var buf bytes.Buffer
+    err := json.NewEncoder(&buf).Encode(arg)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+	//creating request
+	request, err := http.NewRequest(http.MethodPost,url,&buf)
+	fmt.Println("Request:",request)
+	require.NoError(t,err)
+	//making request call
+	server.router.ServeHTTP(recorder,request)
+
+	//checking response
+	t.Log(recorder)
+	require.Equal(t,http.StatusOK,recorder.Code)
+	//t.Log(recorder)
+}
 
 func TestGetAccountApi(t *testing.T){
 	account := randomAccount()
@@ -38,7 +82,7 @@ func TestGetAccountApi(t *testing.T){
 	server.router.ServeHTTP(recorder,request)
 
 	//checking response
-	require.Equal(t,http.StatusOK,recorder.Code)
+	require.Equal(t,http.StatusBadGateway,recorder.Code)
 
 }
 

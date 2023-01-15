@@ -19,7 +19,7 @@ func (s *Server)createUser(ctx *gin.Context){
 		ctx.JSON(http.StatusBadRequest,err)
 		return
 	}
-	fmt.Println(req)
+	fmt.Println("Request Func",req)
 	arg := db.CreateAccountParams{
 		Owner: req.Owner,
 		Balance: req.Balance,
