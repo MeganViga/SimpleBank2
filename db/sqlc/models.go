@@ -5,7 +5,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -14,7 +13,7 @@ type Account struct {
 	Owner     string
 	Balance   int64
 	Currency  string
-	CreatedAt sql.NullTime
+	CreatedAt time.Time
 }
 
 type Entry struct {

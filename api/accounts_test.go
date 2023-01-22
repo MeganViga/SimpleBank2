@@ -14,22 +14,23 @@ import (
 	"github.com/MeganViga/SimpleBank2/util"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+	"time"
 )
 
-func TestCreateAccount(t *testing.T){
+func TestCreateAccount(t *testing.T) {
 	account := randomAccount()
-	t.Log("Initial:",account)
+	t.Log("Initial:", account)
 	arg := db.CreateAccountParams{
-		Owner: account.Owner,
-		Balance: account.Balance,
+		Owner:    account.Owner,
+		Balance:  account.Balance,
 		Currency: account.Currency,
 	}
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	store := mockdb.NewMockStore(controller)
 
-	//stub 
-	store.EXPECT().CreateAccount(gomock.Any(),gomock.Eq(arg)).Times(1).Return(account,nil)
+	//stub
+	store.EXPECT().CreateAccount(gomock.Any(), gomock.Eq(arg)).Times(1).Return(account, nil)
 
 	//creating server using mock store
 	server := NewServer(store)
@@ -40,32 +41,32 @@ func TestCreateAccount(t *testing.T){
 	url := "/users"
 
 	var buf bytes.Buffer
-    err := json.NewEncoder(&buf).Encode(arg)
-    if err != nil {
-        log.Fatal(err)
-    }
+	err := json.NewEncoder(&buf).Encode(arg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//creating request
-	request, err := http.NewRequest(http.MethodPost,url,&buf)
-	fmt.Println("Request:",request)
-	require.NoError(t,err)
+	request, err := http.NewRequest(http.MethodPost, url, &buf)
+	fmt.Println("Request:", request)
+	require.NoError(t, err)
 	//making request call
-	server.router.ServeHTTP(recorder,request)
+	server.router.ServeHTTP(recorder, request)
 
 	//checking response
 	t.Log(recorder) //--> to Log to Stdout on go teest flow
-	require.Equal(t,http.StatusOK,recorder.Code)
+	require.Equal(t, http.StatusOK, recorder.Code)
 	//t.Log(recorder)
 }
 
-func TestGetAccountApi(t *testing.T){
+func TestGetAccountApi(t *testing.T) {
 	account := randomAccount()
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	store := mockdb.NewMockStore(controller)
 
 	//stub
-	store.EXPECT().GetAccount(gomock.Any(),gomock.Eq(account.ID)).Times(1).Return(account,nil)
+	store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(account, nil)
 
 	//creating server using mockstore
 	server := NewServer(store)
@@ -73,24 +74,25 @@ func TestGetAccountApi(t *testing.T){
 	//instead of making actual api call, we can use recorder
 	recorder := httptest.NewRecorder()
 
-	url := fmt.Sprintf("/getuser/%d",account.ID)
+	url := fmt.Sprintf("/getuser/%d", account.ID)
 	//creating request
-	request, err := http.NewRequest(http.MethodGet,url,nil)
-	require.NoError(t,err)
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	require.NoError(t, err)
 
 	//making request call
-	server.router.ServeHTTP(recorder,request)
+	server.router.ServeHTTP(recorder, request)
 
 	//checking response
-	require.Equal(t,http.StatusBadGateway,recorder.Code)
+	require.Equal(t, http.StatusOK, recorder.Code)
 
 }
 
-func randomAccount()db.Account{
+func randomAccount() db.Account {
 	return db.Account{
-		ID: int64(util.RandInt(1,1000)),
-		Owner: util.RandomOwner(),
-		Balance: int64(util.RandomMoney()),
-		Currency: util.RandomCurrency(),
+		ID:        int64(util.RandInt(1, 1000)),
+		Owner:     util.RandomOwner(),
+		Balance:   int64(util.RandomMoney()),
+		Currency:  util.RandomCurrency(),
+		CreatedAt: time.Now(),
 	}
 }
